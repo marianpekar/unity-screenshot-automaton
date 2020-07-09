@@ -10,24 +10,37 @@ public class UltimateScreenshotMaker : MonoBehaviour
     private class ScreenshotCamera
     {
         public Camera Camera;
+
+        [Tooltip("When ticked, this camera will be rotated towards the target")]
         public bool LookAtTarget;
     }
 
+    [Header("Lights")]
+    [Tooltip("If empty, screenshots will be taken in the scene with lights as is.")]
     [SerializeField] private Light[] lights;
 
-    [SerializeField] private bool UseOnlyMainCamera;
-
-    [SerializeField] public bool LookAtTarget;
-
+    [Header("Cameras")]
     [SerializeField] private ScreenshotCamera[] cameras;
 
+    [Tooltip("When ticked, cameras (if any) above will be ignored. If there's no cameras above, the main will be used by default.")]
+    [SerializeField] private bool UseOnlyMainCamera;
+
+    [Tooltip("When ticked, main camera will be rotated towards the target.")]
+    [SerializeField] public bool LookAtTarget;
+
+    [Header("Prefabs")]
+    [Tooltip("Tip: Select all prefabs you want to make a screenshot of and drag-and-drop them on Prefabs label below")]
     [SerializeField] private GameObject[] prefabs;
 
+    [Header("Target")]
+    [Tooltip("An empty GameObject that servers as a position where your prefabs will be instantiated. If none, position [0,0,0] will be used instead.")]
     [SerializeField] private Transform target;
 
-    private GameObject[] pool;
-
+    [Header("Output")]
+    [Tooltip("When more than 1, a larger resolution screenshot will be produced. For example, passing 4 will make the screenshot be 4x4 larger than normal.")]
     [SerializeField] private int scale = 1;
+
+    private GameObject[] pool;
 
     void Start()
     {
