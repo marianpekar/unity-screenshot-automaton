@@ -1,11 +1,33 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UltimateScreenshotMaker : MonoBehaviour
 {
     [Serializable]
-    private class ScreenshotCamera
+    public class LightGroup : IEnumerable<Light>
+    {
+        public Light[] Lights;
+        public IEnumerator<Light> GetEnumerator()
+        {
+            return Lights.AsEnumerable().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+        public Light this[int index]
+        {
+            get { return Lights[index]; }
+            set { Lights[index] = value; }
+        }
+    }
+
+    [Serializable]
+    public class ScreenshotCamera
     {
         public Camera Camera;
 
@@ -15,12 +37,14 @@ public class UltimateScreenshotMaker : MonoBehaviour
 
     [Header("Lights")]
     [Tooltip("If empty, screenshots will be taken in the scene with lights as is.")]
-    [SerializeField] private Light[] lights;
+    [SerializeField] private LightGroup[] lightGroups;
 
     [Header("Cameras")]
+    [Tooltip("If empty, the main camera will be used by default")]
     [SerializeField] private ScreenshotCamera[] cameras;
 
-    [Tooltip("When ticked, cameras (if any) above will be ignored. If there's no cameras above, the main will be used by default.")]
+    [Header("Main Camera")]
+    [Tooltip("When ticked, custom cameras (if any) above will be ignored.")]
     [SerializeField] private bool UseOnlyMainCamera;
 
     [Tooltip("When ticked, main camera will be rotated towards the target.")]
@@ -39,9 +63,12 @@ public class UltimateScreenshotMaker : MonoBehaviour
     [SerializeField] private int scale = 1;
 
     private GameObject[] pool;
+    private string savePath;
 
-    void Start()
+    private void Start()
     {
+        savePath = Application.dataPath.Replace("Assets", "");
+
         if (!target)
         {
             target = new GameObject().transform;
@@ -68,19 +95,9 @@ public class UltimateScreenshotMaker : MonoBehaviour
 
     private void DisableAllLights()
     {
-        if (lights.Length == 0)
-        {
-            lights = new Light[1];
-            var lightGameObject = new GameObject().AddComponent<Light>();
-            lightGameObject.name = "DummyLight";
-            lightGameObject.intensity = 0;
-            lightGameObject.range = 0;
-            lights[0] = lightGameObject;
-            return;
-        }
-
-        foreach (var light in lights)
-            light.enabled = false;
+        foreach (var lightGroup in lightGroups)
+            foreach (var light in lightGroup)
+                light.gameObject.SetActive(false);
     }
 
     private void SetupCameras()
@@ -94,7 +111,7 @@ public class UltimateScreenshotMaker : MonoBehaviour
 
             mainCamera.gameObject.SetActive(true);
 
-            cameras = new ScreenshotCamera[]
+            cameras = new[]
             {
                 new ScreenshotCamera
                 {
@@ -117,28 +134,54 @@ public class UltimateScreenshotMaker : MonoBehaviour
         {
             gameObject.SetActive(true);
 
-            foreach (var light in lights)
+            if (lightGroups.Length != 0)
             {
-                light.enabled = true;
+                foreach (var lightGroup in lightGroups)
+                {
+                    foreach (var light in lightGroup)
+                        light.gameObject.SetActive(true);
 
+                    foreach (var camera in cameras)
+                    {
+                        if (cameras.Length > 1)
+                            camera.Camera.gameObject.SetActive(true);
+
+                        SaveScreenshot(gameObject, lightGroup[0].name, camera);
+
+                        yield return new WaitForSeconds(0.5f);
+
+                        if (cameras.Length > 1)
+                            camera.Camera.gameObject.SetActive(false);
+                    }
+
+                    foreach (var light in lightGroup)
+                        light.gameObject.SetActive(false);
+                }
+            }
+            else
+            {
                 foreach (var camera in cameras)
                 {
-                    if(cameras.Length > 1)
+                    if (cameras.Length > 1)
                         camera.Camera.gameObject.SetActive(true);
 
-                    var fileName = $"{gameObject.name}_{light.name}_{camera.Camera.name}.png";
-                    ScreenCapture.CaptureScreenshot(fileName);
-                    Debug.Log($"{fileName} saved.");
+                    SaveScreenshot(gameObject, "", camera);
 
                     yield return new WaitForSeconds(0.5f);
 
                     if (cameras.Length > 1)
                         camera.Camera.gameObject.SetActive(false);
                 }
-
-                light.enabled = false;
             }
+
             gameObject.SetActive(false);
         }
+    }
+
+    private void SaveScreenshot(GameObject gameObject, string lightGroupName, ScreenshotCamera camera)
+    {
+        var fileName = $"{gameObject.name}_{lightGroupName}_{camera.Camera.name}.png";
+        ScreenCapture.CaptureScreenshot(fileName);
+        Debug.Log($"{savePath}{fileName} saved.");
     }
 }
