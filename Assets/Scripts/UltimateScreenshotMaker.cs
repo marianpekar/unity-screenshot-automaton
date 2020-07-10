@@ -44,7 +44,10 @@ public class UltimateScreenshotMaker : MonoBehaviour
     [SerializeField] private ScreenshotCamera[] cameras;
 
     [Tooltip("When ticked, main and all (if any) cameras will be rotated towards the target.")]
-    [SerializeField] public bool AllLookAtTarget;
+    [SerializeField] private bool allLookAtTarget;
+
+    [Tooltip("Offset is added to look at target position, which is the position of this object.")]
+    [SerializeField] private Vector3 targetOffset;
 
     [Header("Prefabs")]
     [Tooltip("Tip: Select all prefabs you want to make a screenshot of and drag-and-drop them on Prefabs label below")]
@@ -99,7 +102,7 @@ public class UltimateScreenshotMaker : MonoBehaviour
                 new ScreenshotCamera
                 {
                     Camera = mainCamera,
-                    LookAtTarget = AllLookAtTarget
+                    LookAtTarget = allLookAtTarget
                 }
             };
         }
@@ -107,7 +110,7 @@ public class UltimateScreenshotMaker : MonoBehaviour
         foreach (var camera in cameras)
         {
             if (camera.LookAtTarget)
-                camera.Camera.transform.LookAt(gameObject.transform);
+                camera.Camera.transform.LookAt(gameObject.transform.position + targetOffset);
         }
     }
 
