@@ -109,8 +109,11 @@ public class UltimateScreenshotMaker : MonoBehaviour
 
         foreach (var camera in cameras)
         {
-            if (camera.LookAtTarget)
+            if (camera.LookAtTarget || allLookAtTarget)
+            {
+                camera.LookAtTarget = allLookAtTarget;
                 camera.Camera.transform.LookAt(gameObject.transform.position + targetOffset);
+            }
         }
     }
 

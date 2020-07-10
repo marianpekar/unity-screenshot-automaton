@@ -694,7 +694,7 @@ PrefabInstance:
     - target: {fileID: 8183041721994667966, guid: 7482e2831e278f247af877135f915f2b,
         type: 3}
       propertyPath: cameras.Array.data[0].LookAtTarget
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8183041721994667966, guid: 7482e2831e278f247af877135f915f2b,
         type: 3}
@@ -704,7 +704,7 @@ PrefabInstance:
     - target: {fileID: 8183041721994667966, guid: 7482e2831e278f247af877135f915f2b,
         type: 3}
       propertyPath: cameras.Array.data[1].LookAtTarget
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8183041721994667966, guid: 7482e2831e278f247af877135f915f2b,
         type: 3}
@@ -729,6 +729,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4712530982307177680, guid: e75d4b8570306e64b96bacf419056ec1,
         type: 3}
+    - target: {fileID: 8183041721994667966, guid: 7482e2831e278f247af877135f915f2b,
+        type: 3}
+      propertyPath: allLookAtTarget
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183041721994667966, guid: 7482e2831e278f247af877135f915f2b,
+        type: 3}
+      propertyPath: targetOffset.y
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8183041721994667967, guid: 7482e2831e278f247af877135f915f2b,
         type: 3}
       propertyPath: m_Name
