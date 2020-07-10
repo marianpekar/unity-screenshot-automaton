@@ -45,8 +45,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightGroups: []
   cameras: []
-  UseOnlyMainCamera: 0
-  LookAtTarget: 0
+  allLookAtTarget: 0
+  targetOffset: {x: 0, y: 0, z: 0}
   prefabs: []
-  target: {fileID: 0}
   scale: 1
