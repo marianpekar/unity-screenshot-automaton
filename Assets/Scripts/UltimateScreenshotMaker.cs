@@ -43,20 +43,12 @@ public class UltimateScreenshotMaker : MonoBehaviour
     [Tooltip("If empty, the main camera will be used by default")]
     [SerializeField] private ScreenshotCamera[] cameras;
 
-    [Header("Main Camera")]
-    [Tooltip("When ticked, custom cameras (if any) above will be ignored.")]
-    [SerializeField] private bool UseOnlyMainCamera;
-
-    [Tooltip("When ticked, main camera will be rotated towards the target.")]
-    [SerializeField] public bool LookAtTarget;
+    [Tooltip("When ticked, main and all (if any) cameras will be rotated towards the target.")]
+    [SerializeField] public bool AllLookAtTarget;
 
     [Header("Prefabs")]
     [Tooltip("Tip: Select all prefabs you want to make a screenshot of and drag-and-drop them on Prefabs label below")]
     [SerializeField] private GameObject[] prefabs;
-
-    [Header("Target")]
-    [Tooltip("An empty GameObject that servers as a position where your prefabs will be instantiated. If none, position [0,0,0] will be used instead.")]
-    [SerializeField] private Transform target;
 
     [Header("Output")]
     [Tooltip("When more than 1, a larger resolution screenshot will be produced. For example, passing 4 will make the screenshot be 4x4 larger than normal.")]
@@ -68,12 +60,6 @@ public class UltimateScreenshotMaker : MonoBehaviour
     private void Start()
     {
         savePath = Application.dataPath.Replace("Assets", "");
-
-        if (!target)
-        {
-            target = new GameObject().transform;
-            target.name = "Target";
-        }
 
         InitializePool();
         DisableAllLights();
@@ -87,7 +73,7 @@ public class UltimateScreenshotMaker : MonoBehaviour
 
         for (var i = 0; i < prefabs.Length; i++)
         {
-            var instance = Instantiate(prefabs[i], target.position, Quaternion.identity, target.parent);
+            var instance = Instantiate(prefabs[i], gameObject.transform.position, Quaternion.identity, gameObject.transform.parent);
             pool[i] = instance;
             instance.SetActive(false);
         }
@@ -102,12 +88,9 @@ public class UltimateScreenshotMaker : MonoBehaviour
 
     private void SetupCameras()
     {
-        if (cameras.Length == 0 || UseOnlyMainCamera)
+        if (cameras.Length == 0)
         {
             var mainCamera = Camera.main;
-
-            foreach (var camera in cameras)
-                camera.Camera.gameObject.SetActive(false);
 
             mainCamera.gameObject.SetActive(true);
 
@@ -116,7 +99,7 @@ public class UltimateScreenshotMaker : MonoBehaviour
                 new ScreenshotCamera
                 {
                     Camera = mainCamera,
-                    LookAtTarget = LookAtTarget
+                    LookAtTarget = AllLookAtTarget
                 }
             };
         }
@@ -124,7 +107,7 @@ public class UltimateScreenshotMaker : MonoBehaviour
         foreach (var camera in cameras)
         {
             if (camera.LookAtTarget)
-                camera.Camera.transform.LookAt(target);
+                camera.Camera.transform.LookAt(gameObject.transform);
         }
     }
 
