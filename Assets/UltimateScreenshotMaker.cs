@@ -181,7 +181,7 @@ public class UltimateScreenshotMaker : MonoBehaviour
     private void SaveScreenshot(GameObject gameObject, string lightGroupName, ScreenshotCamera camera)
     {
         var fileName = $"{gameObject.name}_{lightGroupName}_{camera.Camera.name}.png";
-        ScreenCapture.CaptureScreenshot(fileName);
+        ScreenCapture.CaptureScreenshot(fileName, scale);
         Debug.Log($"{savePath}{fileName} saved.");
     }
 }
